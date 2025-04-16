@@ -1,0 +1,37 @@
+version: '3'
+services:
+  app:
+    build: .
+    container_name: vite-app
+    restart: always
+    mem_limit: 1g
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    depends_on:
+      - app
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    networks:
+      - default
+    environment:
+      - PYTHONUNBUFFERED=1
+
+networks:
+  default:
+    driver: bridge

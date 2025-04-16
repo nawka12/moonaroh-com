@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "@the-convocation/twitter-scraper": "^0.14.1",
+    "holodex.js": "^2.0.5",
+    "jsdom": "^26.0.0"
+  },
+  "devDependencies": {
+    "vite": "^6.0.6"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "pages:dev": "vite --host",
+    "pages:build": "vite build && cp -f _redirects _headers dist/ || true"
+  }
+}

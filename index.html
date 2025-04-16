@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#6B21A8">
+    
+    <!-- Basic Meta Tags -->
+    <meta name="description" content="Track Moona Hoshinova's live streams, recent videos, and social media updates in real-time">
+    <meta name="keywords" content="Moona Hoshinova, hololive, vtuber, live status">
+    
+    <!-- Open Graph Meta Tags (Facebook, Discord, etc) -->
+    <meta property="og:title" content="Moonaroh - Moona Activity Tracker">
+    <meta property="og:description" content="Track Moona Hoshinova's live streams, recent videos, and social media updates in real-time">
+    <meta property="og:image" content="https://i.ytimg.com/vi/stmZAThUl64/maxresdefault.jpg">
+    <meta property="og:url" content="https://moonaroh.com">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Moonaroh - Moona Activity Tracker">
+    <meta name="twitter:description" content="Track Moona Hoshinova's live streams, recent videos, and social media updates in real-time">
+    <meta name="twitter:image" content="https://i.ytimg.com/vi/stmZAThUl64/maxresdefault.jpg">
+    
+    <title>Moonaroh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+            overscroll-behavior-y: none;
+            background-color: #7C3AED;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Add sparkle styles */
+        .sparkle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: rgba(253, 224, 71, 0.8); /* Increased opacity */
+            pointer-events: none;
+            animation: sparkle-animation 3s linear infinite;
+            box-shadow: 0 0 5px #FDE047, /* Inner glow */
+                        0 0 10px #FDE047, /* Middle glow */
+                        0 0 15px #FDE047; /* Outer glow */
+        }
+
+        @keyframes sparkle-animation {
+            0% {
+                opacity: 0;
+                transform: translateY(0) scale(0);
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-20px) scale(1.2); /* Larger scale */
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-40px) scale(0);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .content-container {
+                padding-left: 0;
+                padding-right: 0;
+            }
+            .time-counter {
+                font-size: 1.125rem;
+            }
+        }
+        .grid-item {
+            background-color: #9333EA;
+            border-color: #EAB308;
+        }
+        .grid-item:hover {
+            border-color: #FDE047;
+        }
+
+        /* Add new styles */
+        .glass-effect {
+            background: rgba(147, 51, 234, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card {
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .scroll-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: rgba(253, 224, 71, 0.5);
+            border-radius: 10px;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(253, 224, 71, 0.7);
+        }
+
+        .section-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background: #FDE047;
+            border-radius: 3px;
+        }
+
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 8px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .live-badge {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.8; }
+            50% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        /* Update container and scroll container styles */
+        .grid-container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        .scroll-container {
+            display: flex;
+            overflow-x: auto;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .card {
+            flex: 0 0 85%; /* Show one card and a peek of the next on mobile */
+            max-width: 85%;
+            scroll-snap-align: start;
+            border-radius: 12px;
+            overflow: hidden;
+            padding: 1rem;
+        }
+
+        /* Desktop layout */
+        @media (min-width: 640px) {
+            .scroll-container {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1rem;
+                padding: 1rem;
+                overflow-x: visible;
+            }
+            
+            .card {
+                flex: 0 0 350px;
+                max-width: 350px;
+                padding: 1.5rem;
+            }
+        }
+
+        /* Large desktop layout */
+        @media (min-width: 1536px) {
+            .scroll-container {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+            
+            .card {
+                flex: 0 0 350px;
+                max-width: 350px;
+            }
+        }
+
+        /* Update thumbnail styles */
+        .stream-thumbnail {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 0.75rem;
+            transition: transform 0.3s ease;
+        }
+
+        /* Add container for thumbnails */
+        .thumbnail-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Add desktop-specific thumbnail size constraints */
+        @media (min-width: 1024px) {
+            .thumbnail-container {
+                width: 100%;
+                height: auto;
+                max-width: 280px; /* Limit width on desktop */
+                margin: 0 auto 1rem auto; /* Center the container */
+            }
+            
+            .stream-thumbnail {
+                width: 100%;
+                height: auto; /* Allow height to adjust based on aspect ratio */
+            }
+        }
+
+        .thumbnail-container:hover .stream-thumbnail {
+            transform: scale(1.05);
+        }
+
+        /* Update card title styles */
+        .card h3 {
+            text-wrap: balance;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+            padding-top: 0; /* Reset padding */
+        }
+
+        /* Add padding only when status badge is present */
+        .card:has(.status-badge) h3 {
+            padding-top: 1.5rem;
+        }
+
+        /* Fallback for browsers that don't support :has */
+        .status-badge + h3 {
+            padding-top: 1.5rem;
+        }
+
+        /* Remove or modify the line-clamp if you want to show full title */
+        .card h3.text-lg {
+            display: block; /* Override any flex settings */
+            line-clamp: unset; /* Standard property */
+            -webkit-line-clamp: unset; /* Vendor prefix */
+            -webkit-box-orient: unset;
+            overflow: visible;
+        }
+
+        /* Mute button styles */
+        #muteButton {
+            transition: transform 0.2s ease;
+        }
+        
+        #muteButton:hover {
+            transform: scale(1.1);
+        }
+        
+        #muteButton:active {
+            transform: scale(0.95);
+        }
+
+        /* Animation classes */
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .animate-slideIn {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Popup styles */
+        #creditsPopup .glass-effect {
+            background: rgba(147, 51, 234, 0.95);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        #creditsPopup a {
+            transition: all 0.2s ease;
+        }
+
+        #creditsPopup a:hover {
+            text-shadow: 0 0 8px rgba(253, 224, 71, 0.5);
+        }
+    </style>
+
+    <script>
+        function createSparkles() {
+            // Create 3 sparkles at once
+            for (let i = 0; i < 3; i++) {
+                const body = document.body;
+                const windowWidth = window.innerWidth;
+                const windowHeight = window.innerHeight;
+
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                
+                // Random position
+                sparkle.style.left = Math.random() * windowWidth + 'px';
+                sparkle.style.top = Math.random() * windowHeight + 'px';
+                
+                // Random size (2-4px)
+                const size = 2 + Math.random() * 2;
+                sparkle.style.width = size + 'px';
+                sparkle.style.height = size + 'px';
+                
+                body.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 3000);
+            }
+        }
+
+        // Create sparkles more frequently (every 50ms)
+        setInterval(createSparkles, 50);
+    </script>
+</head>
+<body class="bg-gradient-to-br from-purple-900 via-purple-700 to-purple-800 min-h-screen flex flex-col text-yellow-100">
+    <!-- Header Section -->
+    <header class="glass-effect py-8 mb-8">
+        <!-- Add audio element -->
+        <audio id="bgMusic" loop>
+            <source src="assets/ada_moona_peko.mp3" type="audio/mpeg">
+        </audio>
+
+        <!-- Add mute button -->
+        <button id="muteButton" aria-label="Toggle sound" class="fixed top-4 right-4 z-50 bg-yellow-500 hover:bg-yellow-400 text-purple-900 font-bold p-2 rounded-full transition-colors duration-200">
+            <svg id="volumeIcon" class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217z"/>
+                <path id="soundWaves" d="M14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z"/>
+            </svg>
+        </button>
+
+        <!-- Add info button -->
+        <button id="infoButton" aria-label="Show information" class="fixed top-4 right-16 z-50 bg-yellow-500 hover:bg-yellow-400 text-purple-900 font-bold p-2 rounded-full transition-colors duration-200">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+        </button>
+
+        <div class="content-container w-full max-w-7xl mx-auto p-4 md:p-6">
+            <h1 class="text-3xl md:text-5xl font-bold text-yellow-300 mb-4 text-center">
+                Moonaroh
+            </h1>
+            <p class="text-lg md:text-2xl text-yellow-100 mb-6 text-center max-w-2xl mx-auto">
+                <span class="font-bold text-yellow-200">Moo</span>na 
+                <span class="font-bold text-yellow-200">N</span>otices & 
+                <span class="font-bold text-yellow-200">A</span>nnouncements:<br class="md:hidden"> 
+                <span class="font-bold text-yellow-200">R</span>ealtime 
+                <span class="font-bold text-yellow-200">O</span>bservational 
+                <span class="font-bold text-yellow-200">H</span>ub
+            </p>
+            <div class="glass-effect rounded-2xl p-4 md:p-6 max-w-md mx-auto text-center shadow-lg">
+                <p class="text-base md:text-lg text-yellow-100 mb-2 opacity-90">Time since last activity</p>
+                <p class="text-2xl md:text-4xl font-mono font-bold text-yellow-300 time-counter" id="timeCounter">Loading...</p>
+            </div>
+        </div>
+        <div class="text-center mt-4">
+            <button 
+                onclick="window.forceCacheRefresh()" 
+                aria-label="Force refresh content"
+                class="bg-yellow-500 hover:bg-yellow-600 text-purple-900 font-bold py-2 px-4 rounded">
+                Force Refresh
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-container w-full max-w-7xl mx-auto px-4 md:px-6 flex-grow">
+        <div id="liveStatus"></div>
+    </main>
+
+    <!-- <div class="text-center mt-4">
+        <button 
+            onclick="window.forceCacheRefresh()" 
+            class="bg-yellow-500 hover:bg-yellow-600 text-purple-900 font-bold py-2 px-4 rounded">
+            Force Refresh
+        </button>
+    </div> -->
+
+    <!-- Footer -->
+    <footer class="glass-effect mt-8 py-6">
+        <div class="content-container mx-auto px-4 md:px-6">
+            <div class="text-sm text-yellow-100 text-center" id="lastUpdate"></div>
+        </div>
+    </footer>
+
+    <!-- Add this at the end of the body, right before the script tag -->
+    <div id="creditsPopup" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-effect rounded-xl p-6 max-w-6xl w-full mx-4 relative">
+            <button id="closeCredits" aria-label="Close credits popup" class="absolute top-4 right-4 text-yellow-300 hover:text-yellow-100">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            <h2 class="text-2xl font-bold text-yellow-300 mb-4">About Moonaroh</h2>
+            <div class="space-y-4 text-yellow-100">
+                <p>A fan-made website to track Moona Hoshinova's activities across various platforms.</p>
+                
+                <h3 class="text-xl font-semibold text-yellow-200 mt-4">Data Sources</h3>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>YouTube data via <a href="https://holodex.net" target="_blank" rel="noopener" class="text-yellow-300 hover:text-yellow-400 underline" aria-label="Holodex API">Holodex API</a></li>
+                    <li>Twitter/X data via <a href="https://nitter.moonaroh.com/moonahoshinova" target="_blank" rel="noopener" class="text-yellow-300 hover:text-yellow-400 underline" aria-label="Nitter">Nitter</a></li>
+                </ul>
+                
+                <h3 class="text-xl font-semibold text-yellow-200 mt-4">Credits</h3>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>Created by <a href="https://x.com/kayfahaarukku" target="_blank" rel="noopener" class="text-yellow-300 hover:text-yellow-400 underline" aria-label="KayfaHaarukku on X/Twitter">KayfaHaarukku</a></li>
+                    <li>Background music: <a href="https://youtu.be/oV0f2pTMr4E?t=458" target="_blank" rel="noopener" class="text-yellow-300 hover:text-yellow-400 underline" aria-label="Usada Pekora BGM (Extended Version)">Usada Pekora BGM (Extended Version) - Hololive x Azur Lane Collab Event</a>, cropped and looped at the <a href="https://www.youtube.com/watch?v=WqvVzRWpGzY" target="_blank" rel="noopener" class="text-yellow-300 hover:text-yellow-400 underline" aria-label="Song made from Moona's noises">Song made from Moona's noises</a> part.</li>
+                </ul>
+                
+                <p class="mt-4 text-sm opacity-75">This is a fan project and is not officially affiliated with Moona Hoshinova or hololive.</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html> 
+
