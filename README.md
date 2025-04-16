@@ -84,6 +84,8 @@ This project includes scripts to set up a self-hosted Nitter instance using Dock
     ```
     *Note: The script uses `sudo` for Docker commands and file operations in system directories within the container.*
 
+    **Important Disclaimer:** The provided `init-letsencrypt.sh` script was written to address specific quirks and configurations encountered on the original author's VPS setup for `moonaroh.com`. It includes workarounds and steps tailored to that environment. **This script is NOT guaranteed to work on your server out-of-the-box.** You may encounter issues related to file paths, permissions, specific Docker/Nginx/Certbot versions, or OS differences. It is **strongly recommended** that you review the script thoroughly, understand its commands, and adapt it to your own server environment, or preferably, write your own deployment script based on the steps outlined here.
+
 4.  **Access the Site:**
     *   Your main application should be available at `https://YOUR_DOMAIN.COM`.
     *   Your Nitter instance should be available at `https://YOUR_NITTER_DOMAIN.COM`.
