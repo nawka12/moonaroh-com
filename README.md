@@ -42,8 +42,8 @@ This project includes scripts to set up a self-hosted Nitter instance using Dock
 
 1.  **Clone the Repository:**
     ```bash
-    git clone <your-repository-url>
-    cd <repository-directory>
+    git clone https://github.com/nawka12/moonaroh-com
+    cd moonaroh-com
     ```
 
 2.  **Configure Placeholders:**
