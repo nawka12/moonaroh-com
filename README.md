@@ -19,6 +19,23 @@ It fetches data from Holodex and a self-hosted Nitter instance to provide a cons
 *   **Pull-to-Refresh:** On mobile, pull down to force a refresh of all data.
 *   **Background Music:** Plays a looped BGM (can be muted).
 
+## Local Development
+
+For local development and testing:
+
+1.  **Install Dependencies:**
+    ```bash
+    npm install
+    ```
+2.  **Configure Environment (Optional but Recommended):**
+    *   You might want to temporarily replace `YOUR_HOLODEX_API_KEY` in `script.js` or use environment variables if your setup supports it (Vite uses `.env` files, see Vite documentation).
+    *   Update `NITTER_INSTANCE_URL` in `js/tweets.js` to a working public or local instance.
+3.  **Run the Development Server:**
+    ```bash
+    npm run dev
+    ```
+    This will usually start a local server (often at `http://localhost:5173` or similar - check the terminal output).
+
 ## Deployment
 
 This project uses Docker and Docker Compose for deployment. Nginx is used as a web server and reverse proxy, and Certbot is used for obtaining Let's Encrypt SSL certificates. It also includes setup for a self-hosted Nitter instance via Docker.
@@ -118,23 +135,6 @@ To update the application:
 2.  Rebuild and restart the containers: `sudo docker-compose down && sudo docker-compose up -d --build`
 3.  If Nitter configuration or dependencies changed, you might need to navigate to the `nitter` directory and run `sudo docker-compose down && sudo docker-compose up -d --build`.
 4.  If Nginx configuration changed, reload it: `sudo docker exec vite-app nginx -s reload`
-
-## Local Development
-
-For local development and testing:
-
-1.  **Install Dependencies:**
-    ```bash
-    npm install
-    ```
-2.  **Configure Environment (Optional but Recommended):**
-    *   You might want to temporarily replace `YOUR_HOLODEX_API_KEY` in `script.js` or use environment variables if your setup supports it (Vite uses `.env` files, see Vite documentation).
-    *   Update `NITTER_INSTANCE_URL` in `js/tweets.js` to a working public or local instance.
-3.  **Run the Development Server:**
-    ```bash
-    npm run dev
-    ```
-    This will usually start a local server (often at `http://localhost:5173` or similar - check the terminal output).
 
 ## Customizing for Other Talents (e.g., Airani Iofifteen)
 
